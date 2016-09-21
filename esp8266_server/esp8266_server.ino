@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <SoftwareSerial.h>
  
 const char* ssid = "nikhil_act";
 const char* password = "pogothepug";
@@ -8,9 +9,14 @@ IPAddress subnet(255,255,255,0);
         
 WiFiServer server(80);
 WiFiClient client;
+
+#define Arduino_RX 4 // D2
+#define Arduino_TX 5 // D1
+SoftwareSerial ArduinoSerial(Arduino_RX, Arduino_TX); // RX | TX
  
 void setup() {
   Serial.begin(115200);
+  ArduinoSerial.begin(9600);
   delay(10);
  
   // Connect to WiFi network
@@ -32,16 +38,24 @@ void setup() {
   Serial.println("Server started"); 
 }
  
-void loop() {
-   if(!client.connected()) {
-     client = server.available();
-     return;
-   }
-
-  /* here we have a connected client */
-  if(client.available()) {
-    String command = client.readStringUntil('\n');
-    Serial.println(command);
-    /* Send the command to arduino */
-  } 
+void loop() 
+{
+  client = server.available();
+  if (client) {
+    Serial.println("new client");
+    while (client.connected()) {
+      if (client.available()) {
+        String command = client.readStringUntil('\n');
+        /* Send the command to arduino */
+        ArduinoSerial.println(command);
+        Serial.println(command);
+      }
+    }
+    // give the web browser time to receive the data
+    delay(1);
+    
+    // close the connection:
+    client.stop();
+    Serial.println("client disonnected");
+  }
 }

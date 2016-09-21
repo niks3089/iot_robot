@@ -8,9 +8,10 @@
 /*
 #define TRIGGER_PIN   
 #define ECHO_PIN
-#define ESP8266_RX
-#define ESP8266_TX
+
 */
+#define ESP8266_RX   2
+#define ESP8266_TX   3
 
 /* Other constants */
 #define TOO_CLOSE 10
@@ -34,6 +35,30 @@
  * Also parses the signal input from the distance sensor.
  */
 
+/* Read and write from nodemcu */
+SoftwareSerial ESPserial(ESP8266_RX, ESP8266_TX); // RX | TX
+
+ 
+void setup() 
+{
+    Serial.begin(9600);     // communication with the host computer
+    ESPserial.begin(9600);  
+ 
+    Serial.println("");
+    Serial.println("Ready");
+    Serial.println("");    
+}
+
+void loop() 
+{
+    // listen for communication from the ESP8266 and then write it to the serial monitor
+    if (ESPserial.available()) {
+      String command = ESPserial.readStringUntil('\n');
+      Serial.println(command);
+    }
+}
+
+#if 0
 namespace IoTBot {
   class Robot
     {
@@ -172,27 +197,4 @@ namespace IoTBot {
         unsigned long endStateTime;
     };
 };
-SoftwareSerial ESPserial(2, 3); // RX | TX
- 
-void setup() 
-{
-    Serial.begin(9600);     // communication with the host computer
-    ESPserial.begin(9600);  
- 
-    Serial.println("");
-    Serial.println("Ready");
-    Serial.println("");    
-}
- 
-void loop() 
-{
-    // listen for communication from the ESP8266 and then write it to the serial monitor
-    if (ESPserial.available()) {
-      //Serial.write(ESPserial.read());
-    } else {
-      Serial.println("Not available");
-    }
-    delay(3000);
-    // listen for user input and send it to the ESP8266
-    //if ( Serial.available() )       {  ESPserial.write( Serial.read() );  }
-}
+#endif
