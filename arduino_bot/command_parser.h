@@ -59,6 +59,11 @@ class CommandParser {
         }
     }
 
+    int get_mode()
+    {
+        return mode;
+    }
+
     int get_command() 
     {
         return cmd_code;
