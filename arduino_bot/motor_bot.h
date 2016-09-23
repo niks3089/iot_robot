@@ -34,12 +34,20 @@ class MotorBot {
    void turn_left(int speed)
    {
       set_speed(speed);
+      front_right_motor.run(BACKWARD);
+      front_left_motor.run(FORWARD);
+      back_right_motor.run(BACKWARD);
+      back_left_motor.run(FORWARD);          
     
    }
 
    void turn_right(int speed)
    {
       set_speed(speed);
+      front_right_motor.run(FORWARD);
+      front_left_motor.run(BACKWARD);
+      back_right_motor.run(FORWARD);
+      back_left_motor.run(BACKWARD);          
    }
 
    void move_forward(int speed)

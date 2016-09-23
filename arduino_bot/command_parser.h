@@ -30,32 +30,36 @@ class CommandParser {
 
     void parse_command()
     {
-        String tmp;
+        String tmp, new_cmd;
         // listen for communication from the ESP8266 and then write it to the serial monitor
         if (ESPserial.available()) {
-            cmd = ESPserial.readStringUntil('\n');
+            new_cmd = ESPserial.readStringUntil('\n');
+            if (cmd == new_cmd) {
+                return;
+            }
+            cmd = new_cmd;
+            if (cmd == "Cauto") {
+                mode = cmd_code = AUTO_MODE;
+            } else if (cmd == "Cman") {
+                mode = cmd_code = MANUAL_MODE;
+            } else if (cmd == "Cstart") {
+                cmd_code = COMMAND_START; 
+            } else if (cmd == "Cstop") {
+                cmd_code = COMMAND_STOP; 
+            } else if (cmd.substring(0, strlen("Cspeed")) == "Cspeed") {
+                cmd_code = COMMAND_SPEED; 
+                tmp = cmd;
+                tmp.remove(0, strlen("Cspeed") + 1);
+                speed = tmp.toInt();
+                Serial.println(speed);
+            } else if (cmd.substring(0, strlen("Cdir")) == "Cdir") {
+                cmd_code = COMMAND_DIR; 
+                tmp = cmd;
+                tmp.remove(0, strlen("Cdir") + 1);
+                direction = tmp.toFloat();
+                Serial.println(direction);
+            }
             Serial.println(cmd);
-        }
-        if (cmd == "Cauto") {
-            mode = AUTO_MODE;
-        } else if (cmd == "Cman") {
-            mode = MANUAL_MODE;
-        } else if (cmd == "Cstart") {
-            cmd_code = COMMAND_START; 
-        } else if (cmd == "Cstop") {
-            cmd_code = COMMAND_STOP; 
-        } else if (cmd.substring(0, strlen("Cspeed")) == "Cspeed") {
-            cmd_code = COMMAND_SPEED; 
-            tmp = cmd;
-            tmp.remove(0, strlen("Cspeed") + 1);
-            speed = tmp.toInt();
-            Serial.println(speed);
-        } else if (cmd.substring(0, strlen("Cdir")) == "Cdir") {
-            cmd_code = COMMAND_DIR; 
-            tmp = cmd;
-            tmp.remove(0, strlen("Cdir") + 1);
-            direction = tmp.toFloat();
-            Serial.println(direction);
         }
     }
 

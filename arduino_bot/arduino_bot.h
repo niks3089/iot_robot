@@ -41,14 +41,24 @@ protected:
     {
         return (distance <= TOO_CLOSE);
     }
+
+    bool turn_left(int speed) 
+    {
+        motor.turn_left(speed);
+    }
+
+    bool turn_right(int speed)
+    {
+        motor.turn_right(speed);
+    }
     
     bool turn(int speed, unsigned long currentTime)
     {
         if (random(2) == 0) {
-            motor.turn_left(speed);
+            turn_left(speed);
         }
         else {
-            motor.turn_right(speed);
+            turn_right(speed);
         }
         state = stateTurning;
         endStateTime = currentTime + random(500, 1000);
@@ -114,10 +124,43 @@ public:
         unsigned long currentTime = millis();
         int distance = distanceAverage.add(distanceSensor.getDistance());
         int command = cmd_parser.get_command();
+        int speed = cmd_parser.get_speed();
+        double direction = cmd_parser.get_direction();
 #if 0
         log("state: %d, currentTime: %lu, distance: %u command: %d\n", 
             state, currentTime, distance, command); 
 #endif
+        switch(command) {
+        case COMMAND_START:
+            if (stopped()) {
+                move(speed);
+            }
+            break;
+        case COMMAND_STOP:
+            if (!stopped()) {
+                stop();
+            }
+            break;
+        default:
+            /* Do nothing */
+            break;
+        }
+        if (!stopped()) {
+            move_in_direction(speed, direction);
+        }
+    }
+
+private:
+    void move_in_direction(int speed, double direction) {
+        if (direction > 3) {
+            /* Turn right */
+            turn_right(speed);
+        } else if (direction < -3) {
+            /* Turn left */
+            turn_left(speed);
+        } else {
+            move(speed);
+        }
     }
 };
 
