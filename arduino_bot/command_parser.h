@@ -14,7 +14,7 @@ typedef enum {
 
 class CommandParser {
     private:
-    String  cmd;
+    char    cmd[100];
     int     cmd_code;
     int     mode;
     int     speed;
@@ -24,42 +24,44 @@ class CommandParser {
     public:
     CommandParser() : 
        mode(AUTO_MODE),
-       speed(255),
+       speed(250),
        direction(0.0),
        cmd_code(COMMAND_NONE) {}
 
     void parse_command()
     {
-        String tmp, new_cmd;
+        String new_cmd, junk;
         // listen for communication from the ESP8266 and then write it to the serial monitor
         if (ESPserial.available()) {
+            junk = ESPserial.readStringUntil('C');
             new_cmd = ESPserial.readStringUntil('\n');
-            if (cmd == new_cmd) {
+
+            if (strcmp(cmd, new_cmd.c_str()) == 0) {
                 return;
             }
-            cmd = new_cmd;
-            if (cmd == "Cauto") {
+            Serial.println(new_cmd);
+            new_cmd.toCharArray(cmd, 100);
+            if (strncmp(cmd, "auto", strlen("auto")) == 0) {
                 mode = cmd_code = AUTO_MODE;
-            } else if (cmd == "Cman") {
+            } else if (strncmp(cmd, "man", strlen("man")) == 0) {
                 mode = cmd_code = MANUAL_MODE;
-            } else if (cmd == "Cstart") {
+            } else if (strncmp(cmd, "start", strlen("start")) == 0) {
                 cmd_code = COMMAND_START; 
-            } else if (cmd == "Cstop") {
+            } else if (strncmp(cmd, "stop", strlen("stop")) == 0) {
                 cmd_code = COMMAND_STOP; 
-            } else if (cmd.substring(0, strlen("Cspeed")) == "Cspeed") {
-                cmd_code = COMMAND_SPEED; 
-                tmp = cmd;
-                tmp.remove(0, strlen("Cspeed") + 1);
-                speed = tmp.toInt();
-                Serial.println(speed);
-            } else if (cmd.substring(0, strlen("Cdir")) == "Cdir") {
+            } else if (new_cmd.substring(0, strlen("speed")) == "speed") {
+                cmd_code = COMMAND_SPEED;
+                new_cmd.remove(0, strlen("speed") + 1);
+                speed = new_cmd.toInt();
+            } else if (new_cmd.substring(0, strlen("dir")) == "dir") {
                 cmd_code = COMMAND_DIR; 
-                tmp = cmd;
-                tmp.remove(0, strlen("Cdir") + 1);
-                direction = tmp.toFloat();
+                new_cmd.remove(0, strlen("dir") + 1);
+                direction = new_cmd.toFloat();
                 Serial.println(direction);
+            } else {
+                Serial.println("Unknown command");
             }
-            Serial.println(cmd);
+
         }
     }
 

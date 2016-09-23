@@ -5,7 +5,8 @@ public:
     Robot()
         : motor(), 
           distanceSensor(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE),
-          distanceAverage(TOO_CLOSE * 10)
+          distanceAverage(TOO_CLOSE * 10),
+          state(stateStopped)
     {
         initialize();
     }
@@ -42,6 +43,11 @@ protected:
         return (distance <= TOO_CLOSE);
     }
 
+    bool set_speed(int speed) 
+    {
+        motor.set_speed(speed);
+    }
+    
     bool turn_left(int speed) 
     {
         motor.turn_left(speed);
@@ -82,14 +88,17 @@ class AutoBot : public Robot
 public:
     void run()
     {
+
         unsigned long currentTime = millis();
         int distance = distanceAverage.add(distanceSensor.getDistance());
         int command = cmd_parser.get_command();
         int speed = cmd_parser.get_speed();
+        
 #if 0
         log("state: %d, currentTime: %lu, distance: %u command: %d\n", 
             state, currentTime, distance, command); 
 #endif
+
         switch(command) {
         case COMMAND_START:
             if (stopped()) {
@@ -101,11 +110,15 @@ public:
                 stop();
             }
             break;
+        case COMMAND_SPEED:
+            if (!stopped()) {
+                set_speed(speed);
+            }         
+            break;
         default:
             /* Do nothing */
             break;
         }
-
         if (moving()) {
             if (obstacleAhead(distance))
                 turn(speed, currentTime);
@@ -140,6 +153,11 @@ public:
             if (!stopped()) {
                 stop();
             }
+            break;
+         case COMMAND_SPEED:
+            if (!stopped()) {
+                set_speed(speed);
+            }         
             break;
         default:
             /* Do nothing */
