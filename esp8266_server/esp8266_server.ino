@@ -56,6 +56,7 @@ void loop()
     
     // close the connection:
     client.stop();
+    ArduinoSerial.println("Cstop");
     Serial.println("client disonnected");
   }
 }

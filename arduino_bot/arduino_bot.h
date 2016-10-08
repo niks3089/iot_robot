@@ -76,6 +76,30 @@ protected:
             return (distance > TOO_CLOSE);
         return false;
     }
+
+    void handle_command(int command, int speed)
+    {
+        switch(command) {
+        case COMMAND_START:
+            if (stopped()) {
+                move(speed);
+            }
+            break;
+        case COMMAND_STOP:
+            if (!stopped()) {
+                stop();
+            }
+            break;
+        case COMMAND_SPEED:
+            if (!stopped()) {
+                set_speed(speed);
+            }         
+            break;
+        default:
+            /* Do nothing */
+            break;
+        }
+    }
     
     bool moving() { return (state == stateMoving); }
     bool turning() { return (state == stateTurning); }
@@ -99,26 +123,8 @@ public:
             state, currentTime, distance, command); 
 #endif
 
-        switch(command) {
-        case COMMAND_START:
-            if (stopped()) {
-                move(speed);
-            }
-            break;
-        case COMMAND_STOP:
-            if (!stopped()) {
-                stop();
-            }
-            break;
-        case COMMAND_SPEED:
-            if (!stopped()) {
-                set_speed(speed);
-            }         
-            break;
-        default:
-            /* Do nothing */
-            break;
-        }
+        handle_command(command, speed);
+        
         if (moving()) {
             if (obstacleAhead(distance))
                 turn(speed, currentTime);
@@ -143,26 +149,8 @@ public:
         log("state: %d, currentTime: %lu, distance: %u command: %d\n", 
             state, currentTime, distance, command); 
 #endif
-        switch(command) {
-        case COMMAND_START:
-            if (stopped()) {
-                move(speed);
-            }
-            break;
-        case COMMAND_STOP:
-            if (!stopped()) {
-                stop();
-            }
-            break;
-         case COMMAND_SPEED:
-            if (!stopped()) {
-                set_speed(speed);
-            }         
-            break;
-        default:
-            /* Do nothing */
-            break;
-        }
+        handle_command(command, speed);
+
         if (!stopped()) {
             move_in_direction(speed, direction);
         }

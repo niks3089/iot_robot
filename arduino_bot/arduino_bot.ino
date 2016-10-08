@@ -14,8 +14,8 @@
 #define TOO_CLOSE 10
 #define MAX_DISTANCE (TOO_CLOSE * 20)
 #define RANDOM_ANALOG_PIN 5
-#define ESP8266_RX   9
-#define ESP8266_TX   10
+#define ESP8266_RX   13
+#define ESP8266_TX   12
 
 /* Read and write from nodemcu */
 SoftwareSerial ESPserial(ESP8266_RX, ESP8266_TX); // RX | TX
