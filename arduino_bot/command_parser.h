@@ -40,6 +40,7 @@ class CommandParser {
                 return;
             }
             Serial.println(new_cmd);
+            digitalWrite(13, HIGH);
             new_cmd.toCharArray(cmd, 100);
             if (strncmp(cmd, "auto", strlen("auto")) == 0) {
                 mode = cmd_code = AUTO_MODE;
@@ -49,6 +50,7 @@ class CommandParser {
                 cmd_code = COMMAND_START; 
             } else if (strncmp(cmd, "stop", strlen("stop")) == 0) {
                 cmd_code = COMMAND_STOP; 
+                digitalWrite(13, LOW);
             } else if (new_cmd.substring(0, strlen("speed")) == "speed") {
                 cmd_code = COMMAND_SPEED;
                 new_cmd.remove(0, strlen("speed") + 1);

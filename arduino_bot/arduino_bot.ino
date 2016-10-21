@@ -14,8 +14,8 @@
 #define TOO_CLOSE 10
 #define MAX_DISTANCE (TOO_CLOSE * 20)
 #define RANDOM_ANALOG_PIN 5
-#define ESP8266_RX   13
-#define ESP8266_TX   12
+#define ESP8266_RX   2
+#define ESP8266_TX   3
 
 /* Read and write from nodemcu */
 SoftwareSerial ESPserial(ESP8266_RX, ESP8266_TX); // RX | TX
@@ -30,7 +30,8 @@ void setup()
 {
     Serial.begin(9600);     // communication with the host computer
     ESPserial.begin(9600);  
- 
+    pinMode(13, OUTPUT);
+    digitalWrite(13, LOW);
     Serial.println("Ready");
 }
 
